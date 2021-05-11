@@ -1,35 +1,34 @@
 import http.client
 import os
 import ast
-import json
-import base64
+import requests
 from filestack import Client
 
-apitoken = os.environ.get('apitoken')
-hosting = os.environ.get('host')
+
 headers = {
-    'x-rapidapi-key': ""+str(apitoken),
-    'x-rapidapi-host': ""+str(hosting)
+    'x-rapidapi-key': ""+str(os.environ.get('apitoken')),
+    'x-rapidapi-host': ""+str(os.environ.get('host'))
 }
-apikey = os.environ.get('postkey')
-Client= Client(apikey)
+covidHeaders = {
+    'x-rapidapi-key': str(os.environ.get('covidApi')),
+    'x-rapidapi-host': "covid-19-statistics.p.rapidapi.com"
+}
+client = Client(str(os.environ.get('postkey')))
 
 store_params = {
     "mimetype": "image/png"
 }
-def postdata(client=Client, filename=""):
+
+
+def postData(client=client, filename=""):
     new_filelink = client.upload(filepath=filename, store_params=store_params)
     return new_filelink.url
 
 
-
-
-
-def getallstatistics(headers=headers):
-    conn = http.client.HTTPSConnection("covid-19-statistics.p.rapidapi.com")
-    conn.request("GET", "/reports/total", headers=headers)
-    res = conn.getresponse()
-    data = res.read().decode("UTF-8")
-    mydata = ast.literal_eval(data)
-    return mydata['data
-    ']
+def getAllStatistics(headers=covidHeaders):
+    url = "https://covid-19-statistics.p.rapidapi.com/reports/total"
+    response = requests.request(
+        "GET", url, headers=headers)
+    data = response.text
+    myData = ast.literal_eval(data)
+    return myData['data']
